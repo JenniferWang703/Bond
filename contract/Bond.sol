@@ -1,67 +1,80 @@
 pragma solidity ^0.4.15;
 
-contract Bond {
+contract Timed {
+    modifier beforeTime(uint timestamp) {
+        require(block.timestamp + 15*60 < timestamp);
+        _;
+    }
+    
+    modifier afterTime(uint timestamp) {
+        require(block.timestamp + 15*60 > timestamp);
+        _;
+    }
+}
+
+contract Staked {
+    modifier costs(uint price) {
+        require(msg.value == price);
+        _;
+    }
+}
+
+contract Bond  is Timed, Staked {
   
     struct Friend {
         address friendAddr;
-        bool yetVoted; //true if yetVoted
+        bool hasVoted; //true if yetVoted
         bool voteCompleted; //true if vote completed for the user
     }
     
     struct Resolution {
         uint128 resolutionId; //unique id for each resolution
         address bonderAddress; //user who sets the resolution
-        mapping (address => Friend) friendsList;
-        address[] friendsArray;
+        mapping (address => Friend) friendAddressMap;
+        address[] friendsList; //all participating friends
         uint128 stake; //users stake;
-        address[] winFriends; //friends that are going to get a share
-        address[] friendVotedTrue;
-        address[] friendVotedFalse;
         string message; //resolution text
-        uint128 voteCount;
-        bool resolutionCompleted; //result
+        uint128 validationCount; //total count of friends who have validated results of the resolution
+        uint128 validationTrueCount; //count of friends who validated as results as true
+        uint128 endTime; //deadline for the resolutions
+        bool completed; //resolution has finished
     }
     
     mapping (uint128  => Resolution) resolutions;
-    uint128[] public allResolutions;
+    uint128 resolutionCount;
+    
+    //Events
+    event ResolutionCreated(uint128 id);
+    event VoteCreated(uint128 resId, bool vote);
+    event ResolutionCompleted(uint128 id);
+    
     //test addresses
     //"0x53d284357ec70ce289d6d64134dfac8e511c8a3d","0xbe0eb53f46cd790cd13851d5eff43d12404d33e8","0x3bf86ed8a3153ec933786a02ac090301855e576b","0x74660414dfae86b196452497a4332bd0e6611e82","0x847ed5f2e5dde85ea2b685edab5f1f348fb140ed"
     //get number of resolution and set resolutionId
-    function resolutionCount() public returns (uint128) {
-        return allResolutions.length;
-    }
-    
-    function checkBalance(uint128 stake, address bonderAddress ) private returns (bool) {
-        if (stake <= bonderAddress.balance) return true;
-        return false;
-    }
     
     //assuming fe takes care of friend valiadation
-    function addNewFriend(uint128 _tempID,address _friendAddr) public {
-        resolutions[_tempID].friendsList[_friendAddr].friendAddr = _friendAddr;
-        resolutions[_tempID].friendsList[_friendAddr].yetVoted = false;
-        resolutions[_tempID].friendsList[_friendAddr].voteCompleted = false;
-        resolutions[_tempID].friendsArray.push( resolutions[_tempID].friendsList[_friendAddr].friendAddr);
+    function addNewFriend(uint128 _tempID,address _friendAddr) private {
+        resolutions[_tempID].friendAddressMap[_friendAddr].friendAddr = _friendAddr;
+        resolutions[_tempID].friendAddressMap[_friendAddr].hasVoted = false;
+        resolutions[_tempID].friendAddressMap[_friendAddr].voteCompleted = false;
+        resolutions[_tempID].friendsList.push(_friendAddr);
     }
     
     
     function newResolution(
         string _message, 
-        uint128 _stake, 
+        uint128 _stake,
+        uint128 _endTime,
         address friend1, 
         address friend2, 
         address friend3, 
         address friend4, 
-        address friend5) public returns (address[]){
+        address friend5) costs(_stake) payable public {
             
-        uint128 tempID = uint128(resolutionCount());
+        uint128 tempID = uint128(resolutionCount);
         // resolutions[tempID].bonderAddress = 0x847ed5f2e5dde85ea2b685edab5f1f348fb140ed; //bonderAddress = msg.sender;
         
         resolutions[tempID].bonderAddress = msg.sender; //bonderAddress = msg.sender;
-        // get balance and check if user has enough
-        bool enoughBalance = checkBalance(2, resolutions[tempID].bonderAddress);
-        require(enoughBalance);
-        
         
         addNewFriend(tempID, friend1);
         addNewFriend(tempID, friend2);
@@ -71,70 +84,77 @@ contract Bond {
       
         resolutions[tempID].resolutionId = tempID;
         resolutions[tempID].message = _message;
-        resolutions[tempID].voteCount = 0;
-        resolutions[tempID].resolutionCompleted = false;
         resolutions[tempID].stake = _stake;
-        allResolutions.push(tempID);
+        resolutions[tempID].endTime = _endTime;
+        ++resolutionCount;
         
-        
-        return resolutions[tempID].friendsArray;
-        //missing send transaction
+        //Raise event when successfully added a new resolution
+        ResolutionCreated(tempID);
     }
     
     //check if is valid friend
     function isFriend(uint128 resolutionId, address friendAddr) public returns (bool) {
-         for(uint128 i = 0; i < 5; i++) {
-            if(resolutions[resolutionId].friendsArray[i] == friendAddr) return true;
-         }
-         return false;
+         return resolutions[resolutionId].friendAddressMap[friendAddr].friendAddr != 0;
+    }
+    
+    function getFriend(uint128 resolutionId, address friendAddr) public returns (address, bool, bool) {
+        Friend memory friend = resolutions[resolutionId].friendAddressMap[friendAddr];
+        return (friend.friendAddr, friend.hasVoted, friend.voteCompleted);
     }
     
     
-    function makeVote(uint128 resolutionId, bool _voteCompleted) public {
-        // address curFriend = 0x53d284357ec70ce289d6d64134dfac8e511c8a3d;
+    function makeVote(uint128 resolutionId, bool _voteCompleted) afterTime(resolutions[resolutionId].endTime) public {
         address curFriend = msg.sender;
         require(isFriend(resolutionId, curFriend)); //change to sender.address
-        require(!resolutions[resolutionId].friendsList[curFriend].yetVoted);
+        require(!resolutions[resolutionId].friendAddressMap[curFriend].hasVoted);
         
-        // resolutions[resolutionId].friendsList[curFriend].voteCompleted = _voteCompleted;
-        // resolutions[resolutionId].friendsList[curFriend].yetVoted = true;
-        // resolutions[resolutionId].voteCount = resolutions[resolutionId].voteCount + 1;
-        // if(_voteCompleted) resolutions[resolutionId].friendVotedTrue.push(curFriend);
-        // else resolutions[resolutionId].friendVotedFalse.push(curFriend);
-                //return resolutions[resolutionId].voteCount;
+        resolutions[resolutionId].friendAddressMap[curFriend].voteCompleted = _voteCompleted;
+        resolutions[resolutionId].friendAddressMap[curFriend].hasVoted = true;
+        resolutions[resolutionId].validationCount += 1;
+        if(_voteCompleted){
+            ++resolutions[resolutionId].validationTrueCount;
+        }
+        
+        VoteCreated(resolutionId, _voteCompleted);
     }
     
     //based on he gets a refund or not
     function isGettingStakeBack(uint128 resolutionId) private returns (bool) {
-        if (resolutions[resolutionId].voteCount == 5 && resolutions[resolutionId].friendVotedFalse.length > 2) return false;
-        if (resolutions[resolutionId].voteCount == 4 && resolutions[resolutionId].friendVotedFalse.length > 1) return false;
-        if (resolutions[resolutionId].voteCount == 4 && resolutions[resolutionId].friendVotedFalse.length == 0) return false;
-        return true;
+        return resolutions[resolutionId].validationCount > resolutions[resolutionId].friendsList.length/2+1;
     } 
     
     //result abd pay    
     function finalResult(uint128 resolutionId) public returns (bool) {
+        require(false == resolutions[resolutionId].completed);
+        require(msg.sender == resolutions[resolutionId].bonderAddress);
+        require(resolutions[resolutionId].validationCount>=resolutions[resolutionId].friendsList.length/2+1);
         bool result;
         result = isGettingStakeBack(resolutionId);
         //if bonder completed the resolutions
         if(result) {
             //send transaction back to resolutions[resolutionId].bonderAddress
-            msg.sender.transfer(resolutions[resolutionId].stake);
+            resolutions[resolutionId].bonderAddress.transfer(resolutions[resolutionId].stake);
         } else {
-            uint128 shareToPay = resolutions[resolutionId].stake / resolutions[resolutionId].friendVotedFalse.length;
-            for(uint128 i = 0; i < resolutions[resolutionId].friendVotedFalse.length; i++) {
+            uint shareToPay = resolutions[resolutionId].stake / resolutions[resolutionId].friendsList.length;
+            for(uint128 i = 0; i < resolutions[resolutionId].friendsList.length; i++) {
                 //pay resolution[resolutionId].friendVotedFalse[i] shareToPay Aion
-                resolutions[resolutionId].friendVotedFalse[i].transfer(shareToPay);
+                resolutions[resolutionId].friendsList[i].transfer(shareToPay);
              }
         }
-        return result;
+        resolutions[resolutionId].completed = true;
+        ResolutionCompleted(resolutionId);
     }
     
     //add any getter setter function as needed
+    function getResolution(uint128 resolutionId) public returns(uint128, string, uint128, uint128, address[]){
+        Resolution storage resolution = resolutions[resolutionId];
+        return(resolutionId, resolution.message, resolution.stake, resolution.endTime, resolution.friendsList);
+    }
 }
 
   // ETH TEST
   // "Build Bond dApp",2,"0x14723a09acff6d2a60dcdf7aa4aff308fddc160c","0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db","0x3bf86ed8a3153ec933786a02ac090301855e576b","0x583031d1113ad414f02576bd6afabfb302140225","0xdd870fa1b7c4700f2bd7f44238821c26f7392148"
+    //"todo",10000000000000000000, 1545082216,"0x14723a09acff6d2a60dcdf7aa4aff308fddc160c","0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db","0x583031d1113ad414f02576bd6afabfb302140225","0xdd870fa1b7c4700f2bd7f44238821c26f7392148","0xdd870fa1b7c4700f2bd7f44238821c26f7392148"
 
 
   // AION TEST

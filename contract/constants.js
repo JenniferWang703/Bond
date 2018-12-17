@@ -5,7 +5,7 @@
  * View the README for instructions on how to compile and deploy the contract.
  */
 // const CONTRACT_ADDRESS = process.env.FTR_CONTRACT_ADDRESS || 'FTR_CONTRACT_ADDRESS';
-const CONTRACT_ADDRESS = "0xA0235F3764BEc69c27BFddeBaD4972ae36E38cEbD55aA1faB17bE10d6F81B8C0";
+const CONTRACT_ADDRESS = "0xa064dAe48Cd78C42bb43Fd913b9A3661eD20a106f22eFB3d4C333E510b68eb1e";
 
 /**
  * This is the private key of the account that will be submitting transactions to the network (and thus
@@ -14,7 +14,7 @@ const CONTRACT_ADDRESS = "0xA0235F3764BEc69c27BFddeBaD4972ae36E38cEbD55aA1faB17b
  * For a production App, this should be stored as an environment variable.
  */
 // const PRIVATE_KEY = process.env.FTR_PRIVATE_KEY || 'FTR_PRIVATE_KEY';
-const PRIVATE_KEY = '0x324382e4ba8a9523459c647bee57c88ca53f4644015c2f2f7ea89a50ed5c065c719f5d767e873a07282bae8515d1b0b069fafdfe13f550ca9dd6180fc289e3f3';
+const PRIVATE_KEY = '094577139ac3c71c6b1a18e9929342d53451b55b0655ffcAAAAAAAAAAAAAAAAAAAAA0b9f479951165522b7349e4e317b7a17ca2bbb670af320bf9619fb54';
 
 
 /**
@@ -27,10 +27,10 @@ const apiKey = '8baef3850b99477bb204280ff5a3c7b0';
 
 
 
-const NODESMITH_ENDPOINT = `https://api.nodesmith.io/v1/aion/testnet/jsonrpc?apiKey=${apiKey}`;
+const NODE_URL = `http://178.128.227.209:8545`;
 
 module.exports = {
   CONTRACT_ADDRESS,
   PRIVATE_KEY,
-  NODESMITH_ENDPOINT,
+  NODE_URL,
 }

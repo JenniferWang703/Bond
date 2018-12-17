@@ -23,7 +23,7 @@ const styles = theme => ({
 });
 
 /**
- * This is the main component of the For The Record app.  It lays out
+ * This is the main component of the app.  It lays out
  * the other components of the app, and is responsible for all interaction with the Aion Network.
  * 
  * Normally, you might use a state management library such as Redux to handle your app's data.
@@ -108,7 +108,7 @@ class App extends Component {
   }
   
   /**
-   * Helper method that reads info from the server about the ForTheRecord contract.
+   * Helper method that reads info from the server about the contract.
    * The response contains the Web3 endpoint, contract ABI, & contract Address
    */ 
   getContractInfo = async () => {

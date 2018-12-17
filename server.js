@@ -22,7 +22,7 @@ app.use(express.json());
 
 // Helper function that reads the solidity contract, compiles it using web3, and returns the compiled contract object.
 const getCompiledContract = async () => {
-  const web3 = new Web3(new Web3.providers.HttpProvider(Constants.NODESMITH_ENDPOINT));
+  const web3 = new Web3(new Web3.providers.HttpProvider(Constants.NODE_URL));
   
   const sol = fs.readFileSync('./contract/Bond.sol', {
     encoding: 'utf8'
@@ -37,7 +37,7 @@ app.get('/', (request,response) => {
 });
 
 /**
- * This endpoint allows the client to get information about the For The Record contract.
+ * This endpoint allows the client to get information about the contract.
  * This allows us to keep the contract itself on the server side, rather than forcing 
  * the client to know about the raw contract and compile it themselves. 
  */
@@ -48,7 +48,7 @@ app.get('/contractInfo', async (request,response) => {
   response.json({
     abi: compiled.Bond.info.abiDefinition,
     address: Constants.CONTRACT_ADDRESS,
-    endpoint: Constants.NODESMITH_ENDPOINT,
+    endpoint: Constants.NODE_URL,
   });
 });
 
@@ -66,7 +66,7 @@ app.post('/submitRecord', async (request,response) => {
   // -----------------------------------------------------------------
 
   // Create our web3 object & an account object will be later used to send the tx.
-  const web3 = new Web3(new Web3.providers.HttpProvider(Constants.NODESMITH_ENDPOINT));
+  const web3 = new Web3(new Web3.providers.HttpProvider(Constants.NODE_URL));
   const signedAccount = web3.eth.accounts.privateKeyToAccount(Constants.PRIVATE_KEY);
 
   // Get a compiled contract object

@@ -1,11 +1,5 @@
-# aion-for-the-record
-A simple web app that permanently records a 140 character message into the Aion Network blockchain.
-View a running demo at [https://aion-for-the-record.herokuapp.com/](https://aion-for-the-record.herokuapp.com/).
+# Bond
 
-View the full tutorial here:
-[https://medium.com/nodesmith-blog/for-the-record-a-web-app-starter-kit-built-on-aion-6dee39e1597b](https://medium.com/nodesmith-blog/for-the-record-a-web-app-starter-kit-built-on-aion-6dee39e1597b)
-
-This sample isn't a 'pure' dApp, because it utilizes a lightweight server component to handle writing transactions to the Aion network.  However, this is a very useful pattern when you wish to pay the transaction fees for your users.  This repository will soon have a sister repo that utilizes the [Aiwa Wallet](https://getaiwa.com) to provide a client only experience.
 
 ## Quick Start
 
@@ -34,7 +28,7 @@ Finally, replace `FTR_PRIVATE_KEY` in `./contract/constants.js` with this value.
 Replace `NODESMITH_API_KEY` in `./contract/constants.js` with your API Key. Alternatively, you can set the NODESMITH_API_KEY environment variable.
 
 The Nodesmith endpoint is currently configured to use the Mastery testnet.  When you are ready to deploy your contract
-on the mainnet, you can edit the `NODESMITH_ENDPOINT` in that file to point to the mainnet.
+on the mainnet, you can edit the `NODE_URL` in that file to point to the mainnet.
 
 #### 3) Fund your account with some test Aion coin
 
@@ -44,7 +38,7 @@ You can request some testnet Aion from the [Mastery Faucet](https://gitter.im/ai
 
 #### 3) Compile & deploy the contract
 
-The main contract can be found in `./contract/ForTheRecord.sol`.
+The main contract can be found in `./contract/Bond.sol`.
 
 * Run `npm run deploy` to compile & deploy the contract.
 * Replace `FTR_CONTRACT_ADDRESS` in `./contract/constants.js` with the contract address printed out in the deploy script. Alternatively, you can set the FTR_CONTRACT_ADDRESS environment variable.

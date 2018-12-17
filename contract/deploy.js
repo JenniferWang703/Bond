@@ -14,7 +14,7 @@ const compileAndDeploy = async (endpoint, fileName, compileOnly) => {
   // Configure web3 to use the correct provider.
   const web3 = new Web3(new Web3.providers.HttpProvider(endpoint));
 
-  // Read the file that contains the forTheRecord contract.
+  // Read the file that contains the contract.
   const sol = fs.readFileSync(fileName, {
     encoding: 'utf8'
   });
@@ -24,13 +24,15 @@ const compileAndDeploy = async (endpoint, fileName, compileOnly) => {
   // contract string and return the ABI and  
   const compiled = await web3.eth.compileSolidity(sol);
   console.log('Compiled Solidity file successfully');
-  console.log(compiled);
+  //console.log(compiled);
 
   if (!compileOnly) {    
     const signedAccount = web3.eth.accounts.privateKeyToAccount(Constants.PRIVATE_KEY);
-    const contract = new web3.eth.Contract(compiled.ForTheRecord.info.abiDefinition);
-    const deployment = contract.deploy({data: compiled.ForTheRecord.code});
-
+    
+    const contract = new web3.eth.Contract(compiled.Bond.info.abiDefinition);
+    console.log(`Contract:${contract}`);
+    const deployment = contract.deploy({data: compiled.Bond.code});
+    console.log(`Code:${deployment}`);
     const gasEstimate = await deployment.estimateGas({
       value: 0,
       gasPrice: '0x9502F9000', // 40000000000
@@ -42,7 +44,7 @@ const compileAndDeploy = async (endpoint, fileName, compileOnly) => {
     const transaction = {
       value: 0,
       gasPrice: '0x4A817C800', // 20000000000
-      gas: gasEstimate,
+      gas: 5000000,
       data: contractData,
     };
 
@@ -61,4 +63,4 @@ const compileAndDeploy = async (endpoint, fileName, compileOnly) => {
 
 const compileOnly = process.argv[2] || false;
 
-compileAndDeploy(Constants.NODESMITH_ENDPOINT, './contract/ForTheRecord.sol', compileOnly)
+compileAndDeploy(Constants.NODE_URL, './contract/Bond.sol', compileOnly)
