@@ -1,173 +1,76 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, Typography } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
+import EmptyListPlaceholder from './ui/EmptyListPlaceholder'
+import CreateBondModal from './ui/CreateBondModal'
+import BondListItem from './ui/BondListItem'
 import Web3 from 'aion-web3';
 
 import './App.css';
-import RecordInput from './RecordInput';
-import RecordList from './RecordList';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
+import { BOND_ABI, CONTRACT_ADDRESS, NODE_URL } from './constants'
+const web3 = new Web3(new Web3.providers.HttpProvider(NODE_URL));
+const contract = new web3.eth.Contract(BOND_ABI, CONTRACT_ADDRESS);
 
 const styles = theme => ({
-  root: {
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh'
+  root:{
   },
-  flex: {
-    flex: 1,
+  fab: {
+    position: 'fixed',
+    bottom: theme.spacing.unit * 2,
+    zIndex: 1,
+    left: 0,
+    right: 0,
+    margin: '0 auto',
   },
-  footer: {
-    textAlign: 'center',
-    padding: 8,
-  },
-});
-
-/**
- * This is the main component of the app.  It lays out
- * the other components of the app, and is responsible for all interaction with the Aion Network.
- * 
- * Normally, you might use a state management library such as Redux to handle your app's data.
- * To keep it simple, we just store the app data as state in the base App component.
- * 
- * This component has the functionality to submit a message to the app backend - where
- * it will be submitted as a transaction to the Aion network.  It also reads directly from
- * the smart contract event log in order to build up the app state..
- */
+})
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { 
-      messages: {},
-      loadingMessages: false,
-      submittingMessage: false,
+    this.state = {
     };
   }
 
-  /**
-   * Sends a message to the backend, where it will be submitted to the Aion network.
-   */
-  submitMessage = async (message) => {
-    this.setState({ submittingMessage: true });
-
-    const rawResponse = await fetch(`/submitRecord`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'text/html'
-      },
-      body: JSON.stringify({ message: message })
-    });
-    
-    const content = await rawResponse.json();
-    if (content.status === 'success') {
-      const messages = Object.assign({}, this.state.messages);
-      messages[content.hash] = {
-        text: message,
-        isPending: true,
-      };
-
-      this.setState({ messages });
-      console.log(`Message submitted: ${content.url}`);
-
-      // Once the transaction has been mined we need to clean up the UI
-      // state so that the latest message no longer says pending. 
-      const checkReceipt = this.accountInterval = window.setInterval(() => {
-        this.checkTransactionStatus(checkReceipt, content.hash, message);
-      }, 1000);
-    } else {
-      console.error('Unexpected error when submitting the message.');
-    }
-
-    this.setState({ submittingMessage: false });
-  }
-
-  /**
-   * Helper function that pings getTransactionReceipt for a specific tx hash.
-   * Interval will ping every second until the transaction has been mined.
-   */
-  checkTransactionStatus = async (interval, hash, message) => {
-    const contractInfo = await this.getContractInfo();
-    const web3 = new Web3(new Web3.providers.HttpProvider(contractInfo.endpoint));
-    
-    web3.eth.getTransactionReceipt(hash, (error, receipt) => {
-      if (error) {
-        console.error(error);
-        clearInterval(interval);
-      }
-
-      if (receipt && receipt.status) {
-        const messages = Object.assign({}, this.state.messages);
-        messages[hash] = {
-          text: message,
-          isPending: false,
-        };
-        this.setState({ messages });
-        clearInterval(interval);
-      }
-    });
-  }
-  
-  /**
-   * Helper method that reads info from the server about the contract.
-   * The response contains the Web3 endpoint, contract ABI, & contract Address
-   */ 
-  getContractInfo = async () => {
-    const rawResponse = await fetch(`/contractInfo`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-    });
-    
-    let resp =  await rawResponse.json();
-    console.log(rawResponse);
-    return resp;
-  };
-
-  /**
-   * Within the componentDidMount, we read the event log of our smart contract.
-   * This allows us to populate the app state with previous messages from the contract.
-   * 
-   * Currently, reading events is pretty slow, so in this demo app, we only check the last 1000 blocks.
-   */
   componentDidMount = () => {
     (async () => {
-      this.setState({ loadingMessages: true });
 
-      const contractInfo = await this.getContractInfo();
-      const web3 = new Web3(new Web3.providers.HttpProvider(contractInfo.endpoint));
-      const contract = new web3.eth.Contract(contractInfo.abi, contractInfo.address);
-
-      const blockNum = await web3.eth.getBlockNumber();
-      const thousandBlocksAgo = (blockNum - 1000).toString();
-
-      contract.getPastEvents('AllEvents', { fromBlock: thousandBlocksAgo, toBlock: 'latest' }, (error, eventLogs) => {
-        const messages = {};
-        if (!error) {
-          eventLogs.forEach(event => {
-            messages[event.transactionHash] = {
-              text: event.returnValues.message,
-              isPending: false,
-            }
-          });
-
-          this.setState({ messages });
-        } else {
-          console.log(`An unexpected error occurred when reading event logs: ${error}`)
-        }
-
-        this.setState({ loadingMessages: false });
-      });
     })();
   }
 
+  handleOpenCreateBond = () => {
+    this.setState({ createBondOpened: true });
+    console.log("handleOpen:")
+  };
+
   render() {
+    const { classes } = this.props;
+    const { createBondOpened } = this.state;
+    console.log("create:"+createBondOpened)
     return (
-      <div className={this.props.classes.root}>
-        <RecordInput submitMessage={this.submitMessage} submittingMessage={this.state.submittingMessage} />
-        <RecordList messages={this.state.messages} transactionHashes={this.state.transactionHashes} loadingMessages={this.state.loadingMessages} />
-        <div className={this.props.classes.flex}/>
+      <div style={{height:'100%'}}>
+      
+        <Grid
+          className={classes.root}
+          container
+          direction="column"
+          justify="center"
+          spacing="32"
+          alignItems="center">
+            <BondListItem />
+            <BondListItem />
+            <BondListItem />
+            <BondListItem />
+            <BondListItem />
+            <BondListItem />
+            <EmptyListPlaceholder />
+            <Fab color="primary" aria-label="Add" className={classes.fab} onClick={this.handleOpenCreateBond}>
+              <AddIcon />
+            </Fab>
+        </Grid>
+        <canvas id="stars" width="300" height="300"> </canvas>
+        <CreateBondModal open={createBondOpened} onClose={()=>{this.setState({ createBondOpened: false })}}/>
       </div>
     );
   }
@@ -176,5 +79,4 @@ class App extends Component {
 App.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-
-export default withStyles(styles)(App);
+export default withStyles(styles, { withTheme: true })(App);

@@ -23,8 +23,8 @@ const compileAndDeploy = async (endpoint, fileName, compileOnly) => {
   // Compile the contract with web3.  This will use the Nodesmith endpoint to compile the
   // contract string and return the ABI and  
   const compiled = await web3.eth.compileSolidity(sol);
+  console.log(compiled.Bond.info.abiDefinition)
   console.log('Compiled Solidity file successfully');
-  //console.log(compiled);
 
   if (!compileOnly) {    
     const signedAccount = web3.eth.accounts.privateKeyToAccount(Constants.PRIVATE_KEY);
