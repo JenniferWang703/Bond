@@ -1,6 +1,5 @@
 body {
   margin: 0;
-  background: linear-gradient(45deg, #FCF653 30%, #ffeb3b 90%);
   min-height: 100% !important;
   height: 100%;
 }
@@ -13,6 +12,7 @@ html {
   height: 100%;
 }
 #stars {
+  background: linear-gradient(45deg, #FBC02D 30%, #FDD835 90%);
 	display: block;
 	position: fixed;
 	width: 100%;
