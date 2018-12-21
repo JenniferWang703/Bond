@@ -146,9 +146,9 @@ contract Bond  is Timed, Staked {
     }
     
     //Getters
-    function getResolution(uint128 resolutionId) public constant returns(uint128, string, uint128, uint128, address[]){
+    function getResolution(uint128 resolutionId) public constant returns(uint128,address, string, uint128, uint128, address[]){
         Resolution storage resolution = resolutions[resolutionId];
-        return(resolutionId, resolution.message, resolution.stake, resolution.endTime, resolution.friendsList);
+        return(resolutionId,resolution.bonderAddress, resolution.message, resolution.stake, resolution.endTime, resolution.friendsList);
     }
     
     function getParticipatingResolutions(address addr) public constant returns (uint128[], bool[]){
@@ -161,9 +161,14 @@ contract Bond  is Timed, Staked {
         }
         uint128[] memory resolutionIds = new uint128[](participationCount);
         bool[] memory creatorFlag = new bool[](participationCount);
+        uint128 counter = 0;
         for(uint128 j=0; j<resolutionCount; j++){
-            resolutionIds[j] = j;
-            creatorFlag[j] = resolutions[j].bonderAddress == addr;
+            Resolution storage resolution2 = resolutions[j];
+            if(resolution2.bonderAddress == addr || resolution2.friendAddressMap[addr].friendAddr!=0){
+                resolutionIds[counter] = j;
+                creatorFlag[counter] = resolution2.bonderAddress == addr;
+                ++counter;
+            }
         }
         return (resolutionIds, creatorFlag);
     }
@@ -171,3 +176,5 @@ contract Bond  is Timed, Staked {
 
   // ETH TEST
   //"todo",10000000000000000000, 1545082216,"0x14723a09acff6d2a60dcdf7aa4aff308fddc160c","0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db","0x583031d1113ad414f02576bd6afabfb302140225","0xdd870fa1b7c4700f2bd7f44238821c26f7392148","0xdd870fa1b7c4700f2bd7f44238821c26f7392148"
+  //AION
+  //"testing",10000000000000000000,1545082216,"0xa09866ac4d3a95614d5a36ecd59977d052684451839a6216f40023aeceae8dbc","0xa069e108b787ecd14c59b0f445e82b30c229e30cb654754d205ae0370c607fc4","0xa0f09de1e3ef119226dbc339dc55e8c5c360bda2cca906a5602f765ef13487ca","0xa0fda14b5d9419de84ba9b72d2cc3df29c54b7dcc5905a130de8c034d79e3187","0xa0f80633c1b64574751f0caea24809cf495faaea0443ad23325eb6fa7e0e8e06"

@@ -21,3 +21,6 @@ html {
   z-index: 0;
   top:0;
 }
+.Web3Provider-container{
+  background: transparent !important;
+}

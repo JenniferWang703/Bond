@@ -5,7 +5,7 @@
  * View the README for instructions on how to compile and deploy the contract.
  */
 // const CONTRACT_ADDRESS = process.env.FTR_CONTRACT_ADDRESS || 'FTR_CONTRACT_ADDRESS';
-const CONTRACT_ADDRESS = "0xa0d8c51502d15fcd6c34ccc927fa0c21ff5fb6fe0526c1f814142bb5f8e63485";
+const CONTRACT_ADDRESS = "0xa0778d1dacd5bd6df198e7b142c23498d0392fce9ed34f5daacc2e4dba9a6a49";
 
 /**
  * This is the private key of the account that will be submitting transactions to the network (and thus

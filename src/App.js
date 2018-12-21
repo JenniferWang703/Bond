@@ -67,37 +67,31 @@ class App extends Component {
     console.log("handleOpen:")
   };
 
-  onBondCreationFinished = (bondId) => {
-    console.log("onBondCreationFinished:" + bondId)
+  onBondCreationFinished = (bondId, txR) => {
+    console.log("onBondCreationFinished:" + bondId+", "+txR)
     this.setState({ createBondOpened: false })
-    if (bondId != null) {
+    if (txR != null && bondId != null) {
       this.setState({ commitState: 1 })
-      this.subscribeToBondCreated(bondId).then((result)=>{
+      const interval = window.setInterval(() => {
         this.setState({ commitState: 2 })
-      })
+        this.accountChanged(window.aionweb3.eth.accounts[0]) // can be optimized
+        clearInterval(interval);
+        // this.state.web3.eth.getTransactionReceipt(txR, (error, receipt) => {
+        //   if (error) {
+        //     console.error(error);
+        //   }
+        //   if (receipt && receipt.status) {
+        //     console.log("txR status:"+ receipt.status)
+        //   }
+
+        //   this.setState({ commitState: 2 })
+        //   this.accountChanged(window.aionweb3.eth.accounts[0]) // can be optimized
+        //   clearInterval(interval);
+        // })
+      }, 20*1000);
+      
     }
   }
-
-  subscribeToBondCreated = (bondId) => {
-    return new Promise((resolve, reject) => {
-        const options = {
-            filter: {
-              id: bondId
-            },
-            fromBlock: 'latest'
-        }
-        console.log("Listening for ResolutionCreated event for id=" + bondId);
-        this.state.contract.ResolutionCreated(options, (err, res) => {
-            console.log("Bond Registered:" + JSON.stringify(res));
-            if (err) {
-                reject(err)
-            } else if (res) {
-                resolve(res)
-                console.log("ResolutionCreated gas:" + this.state.web3.eth.getTransactionReceipt(res.transactionHash).nrgUsed)
-            }
-        });
-    });
-}
 
   //Start of the flow
   accountChanged = (newAddress) => {
@@ -107,12 +101,32 @@ class App extends Component {
     const contract = window.aionweb3.eth.contract(BOND_ABI).at(CONTRACT_ADDRESS)
     console.log(contract)
     const resCount = contract.resolutionCount().toNumber()
-    console.log(resCount)
+    console.log("total bonds:"+resCount)
     this.setState({
       web3: window.aionweb3,
       contract: contract
-    }) //address can be accessed from web3 object
-    //todo load my bonds
+    }) 
+    const participatingBonds = contract.getParticipatingResolutions(window.aionweb3.eth.accounts[0])
+    console.log("bonds address participating in:"+participatingBonds)
+    const cleanBonds = participatingBonds[0].map((item, index)=>{return {id:item.toNumber(), creator:participatingBonds[1][index]}} )
+    console.log("parsed bonds:"+JSON.stringify(cleanBonds))
+    const fullBonds= cleanBonds.map((cleanItem)=>{
+      const fullBond =contract.getResolution(cleanItem.id);
+      console.log("full data:"+JSON.stringify(fullBond))
+      return {
+            id: fullBond[0].toNumber(),
+            message: fullBond[2],
+            stake: (fullBond[3].toNumber() / Math.pow(10,18)).toFixed(2),
+            endTime: fullBond[4].toNumber()*1000,
+            friendsList: fullBond[5],
+            creator: cleanItem.creator
+          }
+    })
+    console.log(fullBonds)
+    this.setState({ bonds: fullBonds })
+  }
+
+  testData = () => {
     // const testMyBonds = [];
     // for (var i = 0; i < 10; i++) {
     //   testMyBonds.push({
@@ -130,25 +144,8 @@ class App extends Component {
     // }
     // this.setState({ bonds: testMyBonds })
     //todo load friends bonds
-
-    const participatingBonds = contract.getParticipatingResolutions(window.aionweb3.eth.accounts[0])
-    console.log(participatingBonds)
-    const cleanBonds = participatingBonds[0].map((item, index)=>{return {id:item.toNumber(), creator:participatingBonds[1][index]}} )
-    console.log(cleanBonds)
-    const fullBonds= cleanBonds.map((cleanItem)=>{
-      const fullBond =contract.getResolution(cleanItem.id);
-      return {
-            id: fullBond[0].toNumber(),
-            message: fullBond[1],
-            stake: (fullBond[2].toNumber() / Math.pow(10,18)).toFixed(2),
-            endTime: fullBond[3].toNumber()*1000,
-            friendsList: fullBond[4],
-            creator: cleanItem.creator
-          }
-    })
-    console.log(fullBonds)
-    this.setState({ bonds: fullBonds })
   }
+
   handleSnackClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;

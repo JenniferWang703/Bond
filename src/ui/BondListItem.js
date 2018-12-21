@@ -17,6 +17,7 @@ const styles = theme => ({
   card: {
     marginTop: 24,
     maxWidth: 500,
+    minWidth: 500,
     background: 'linear-gradient(45deg, #D4005E 30%, #FCF653 90%)',
     zIndex: 1
   },

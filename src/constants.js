@@ -1,5 +1,5 @@
 
-const CONTRACT_ADDRESS = "0xa0d8c51502d15fcd6c34ccc927fa0c21ff5fb6fe0526c1f814142bb5f8e63485";
+const CONTRACT_ADDRESS = "0xa0778d1dacd5bd6df198e7b142c23498d0392fce9ed34f5daacc2e4dba9a6a49";
 const apiKey = '8baef3850b99477bb204280ff5a3c7b0';
 const NODE_URL = `https://api.nodesmith.io/v1/aion/testnet/jsonrpc?apiKey=${apiKey}`;
 
@@ -40,6 +40,10 @@ const BOND_ABI = [
 			{
 				"name": "",
 				"type": "uint128"
+			},
+			{
+				"name": "",
+				"type": "address"
 			},
 			{
 				"name": "",

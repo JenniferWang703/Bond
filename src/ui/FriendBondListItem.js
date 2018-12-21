@@ -19,6 +19,7 @@ const styles = theme => ({
   card: {
     marginTop: 24,
     maxWidth: 500,
+    minWidth: 500,
     background: 'linear-gradient(45deg, #D4005E 30%, #FCF653 90%)',
     zIndex: 1
   },
@@ -40,10 +41,11 @@ const styles = theme => ({
 }
 });
 function makeVote(web3,contract, bondId, flag){
-  console.log(web3!==null&&contract!==null&&flag)
+  console.log("makeVote:"+bondId+","+flag)
   contract.makeVote(
     bondId, 
-    flag
+    flag,
+    {gas:500000, from:web3.eth.accounts[0]}
   ).then((res)=>{
     console.log(res)
   }).catch((err)=>{

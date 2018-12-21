@@ -103,9 +103,7 @@ class CreateBondModal extends Component {
                     { gas: 2000000, from: this.props.web3.eth.accounts[0],to:this.props.web3.eth.accounts[0], value: data.stakeAmount*Math.pow(10,18) })
                 return create;
             }).then((result) => {
-                return this.props.contract.resolutionCount.call()
-            }).then((resId) => {
-                this.props.onClose(resId)
+                this.props.onClose(this.props.contract.resolutionCount(), result)
             }).catch((error) => {
                 this.setState({ error: error.toString() })
             })
