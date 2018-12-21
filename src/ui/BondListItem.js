@@ -31,8 +31,19 @@ const styles = theme => ({
   }
 });
 
+function payout(web3, contract, bondId){
+  console.log(web3!==null&&contract!==null)
+  contract.finalResult(
+    bondId
+  ).then((res)=>{
+    console.log(res)
+  }).catch((err)=>{
+    console.log(err)
+  })
+}
+
 function BondListItem(props) {
-  const { classes, bond } = props;
+  const { classes, bond, contract, web3 } = props;
   return (
     <Card className={classes.card}>
       <CardActionArea>
@@ -45,8 +56,8 @@ function BondListItem(props) {
               {formatEndDatePretty(bond.endTime)}
           </Typography>
             <Typography className={classes.price} gutterBottom variant="h5" component="h2">
-              <img alt="Aion Logo" src="/assets/images/red_aion_logo.png" width="18px" height="18px" />
-              {'\u00A0'}{(bond.stake/Math.pow(10,18)).toFixed(2)}
+            {'\u00A0'}<img alt="Aion Logo" src="/assets/images/red_aion_logo.png" width="18px" height="18px" />
+              {'\u00A0'}{bond.stake}
           </Typography>
           </Grid>
           <Typography className={classes.cardContent} component="p">
@@ -55,7 +66,7 @@ function BondListItem(props) {
         </CardContent>
       </CardActionArea>
       <CardActions className={classes.actionsGroup}>
-        <Button size="small" color="primary">
+        <Button size="small" color="primary" onClick={()=>{payout(web3,contract, bond.id)}}>
           Complete
         </Button>
       </CardActions>

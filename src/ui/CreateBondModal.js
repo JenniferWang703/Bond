@@ -83,44 +83,25 @@ class CreateBondModal extends Component {
             this.state.friends)
             .then((data) => {
                 //fake
-                this.props.onClose(0);
-                return;
+                // this.props.onClose(0);
+                // return;
                 // end fake
                 this.setState({ error: null })
                 console.log(data.bondMessage+","+
                     data.stakeAmount+","+
                     Math.floor(data.deadline.getTime()/1000)+","+
                     JSON.stringify(data.friends))
-                    const methodData = this.props.contract.newResolution.getData(
-                        data.bondMessage,
-                        data.stakeAmount*Math.pow(10,18),
-                        Math.floor(data.deadline.getTime()/1000),
-                        data.friends[0],
-                        data.friends[1],
-                        data.friends[2],
-                        data.friends[3],
-                        data.friends[4],
-                        {nrg:200000, value:data.stakeAmount*Math.pow(10,18)});
-                    // const methodData = this.props.contract.newResolution.getData("", 1,1,
-                    // "0xa0d84a7c8409668f3249b1478ea8253e8f707004494fa9f50afc9012c8a5f7be",
-                    // "0xa0d84a7c8409668f3249b1478ea8253e8f707004494fa9f50afc9012c8a5f7be",
-                    // "0xa0d84a7c8409668f3249b1478ea8253e8f707004494fa9f50afc9012c8a5f7be",
-                    // "0xa0d84a7c8409668f3249b1478ea8253e8f707004494fa9f50afc9012c8a5f7be",
-                    // "0xa0d84a7c8409668f3249b1478ea8253e8f707004494fa9f50afc9012c8a5f7be",
-                    // {nrg:200000});
-        /*var nrg = window.aionweb3.eth.estimateGas({to: Platypus.address, data: methodData});*/
-                const tx = {data: methodData, gas: 1200000};
-                return this.props.web3.eth.sendTransaction(tx);
-                // const create = this.props.contract.newResolution(data.bondMessage,
-                //     data.stakeAmount,
-                //     Math.floor(data.deadline.getTime()/1000),
-                //     data.friends[0],
-                //     data.friends[1],
-                //     data.friends[2],
-                //     data.friends[3],
-                //     data.friends[4],
-                //     { from: this.props.web3.eth.accounts[0],to:this.props.web3.eth.accounts[0], value: this.props.web3.toWei(1, "ether") })
-                //return create;
+                    
+                const create = this.props.contract.newResolution(data.bondMessage,
+                    data.stakeAmount*Math.pow(10,18),
+                    Math.floor(data.deadline.getTime()/1000),
+                    data.friends[0],
+                    data.friends[1],
+                    data.friends[2],
+                    data.friends[3],
+                    data.friends[4],
+                    { gas: 2000000, from: this.props.web3.eth.accounts[0],to:this.props.web3.eth.accounts[0], value: data.stakeAmount*Math.pow(10,18) })
+                return create;
             }).then((result) => {
                 return this.props.contract.resolutionCount.call()
             }).then((resId) => {

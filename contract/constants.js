@@ -5,7 +5,7 @@
  * View the README for instructions on how to compile and deploy the contract.
  */
 // const CONTRACT_ADDRESS = process.env.FTR_CONTRACT_ADDRESS || 'FTR_CONTRACT_ADDRESS';
-const CONTRACT_ADDRESS = "0xa0865422e964feb6bf885ac8bf3420a70ef8b61c9e56b4e18ccdd666a25e62ff";
+const CONTRACT_ADDRESS = "0xa0d8c51502d15fcd6c34ccc927fa0c21ff5fb6fe0526c1f814142bb5f8e63485";
 
 /**
  * This is the private key of the account that will be submitting transactions to the network (and thus
@@ -36,7 +36,7 @@ const BOND_ABI = [ { outputs: [ [Object] ],
   name: 'isFriend',
   type: 'function' },
 { outputs: [ [Object], [Object], [Object], [Object], [Object] ],
-  constant: false,
+  constant: true,
   payable: false,
   inputs: [ [Object] ],
   name: 'getResolution',
@@ -52,6 +52,12 @@ const BOND_ABI = [ { outputs: [ [Object] ],
   payable: false,
   inputs: [ [Object] ],
   name: 'finalResult',
+  type: 'function' },
+{ outputs: [ [Object], [Object] ],
+  constant: true,
+  payable: false,
+  inputs: [],
+  name: 'getParticipatingResolutions',
   type: 'function' },
 { outputs: [ [Object], [Object], [Object] ],
   constant: false,

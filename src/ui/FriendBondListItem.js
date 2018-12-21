@@ -39,9 +39,20 @@ const styles = theme => ({
     color:"#ff0000"
 }
 });
+function makeVote(web3,contract, bondId, flag){
+  console.log(web3!==null&&contract!==null&&flag)
+  contract.makeVote(
+    bondId, 
+    flag
+  ).then((res)=>{
+    console.log(res)
+  }).catch((err)=>{
+    console.log(err)
+  })
+}
 
 function FriendBondListItem(props) {
-    const { classes, bond } = props;
+    const { classes, bond, contract, web3 } = props;
     return (
       <Card className={classes.card}>
         <CardActionArea>
@@ -54,8 +65,8 @@ function FriendBondListItem(props) {
                 {formatEndDatePretty(bond.endTime)}
             </Typography>
               <Typography className={classes.price} gutterBottom variant="h5" component="h2">
-                <img alt="Aion Logo" src="/assets/images/red_aion_logo.png" width="18px" height="18px" />
-                {'\u00A0'}{(bond.stake/Math.pow(10,18)).toFixed(2)}
+              {'\u00A0'}<img alt="Aion Logo" src="/assets/images/red_aion_logo.png" width="18px" height="18px" />
+                {'\u00A0'}{bond.stake}
             </Typography>
             </Grid>
             <Typography className={classes.cardContent} component="p">
@@ -64,10 +75,10 @@ function FriendBondListItem(props) {
           </CardContent>
         </CardActionArea>
         <CardActions className={classes.actionsGroup}>
-            <IconButton className={classes.actionPositive} aria-label="Approve">
+            <IconButton className={classes.actionPositive} aria-label="Approve" onClick={()=>{makeVote(web3, contract, bond.id, true)}}>
                 <CheckIcon />
             </IconButton>
-            <IconButton className={classes.actionNegative} aria-label="Disapprove">
+            <IconButton className={classes.actionNegative} aria-label="Disapprove" onClick={()=>{makeVote(web3, contract, bond.id, false)}}>
                 <CloseIcon />
             </IconButton>
         </CardActions>

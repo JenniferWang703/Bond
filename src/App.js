@@ -34,7 +34,8 @@ const styles = theme => ({
   },
   sectionHeader: {
     marginTop: theme.spacing.unit * 4,
-    textShadow: '2px 2px rgba(0,0,0,0.3)'
+    textShadow: '2px 2px rgba(0,0,0,0.3)',
+    zIndex: 2
   },
   waitingSnack: {
     background: green[600]
@@ -71,41 +72,82 @@ class App extends Component {
     this.setState({ createBondOpened: false })
     if (bondId != null) {
       this.setState({ commitState: 1 })
-      setTimeout(() => {
+      this.subscribeToBondCreated(bondId).then((result)=>{
         this.setState({ commitState: 2 })
-      }, 10000)
-      //todo listen to ResolutionCreated even then change commitState:2 and update list
+      })
     }
   }
+
+  subscribeToBondCreated = (bondId) => {
+    return new Promise((resolve, reject) => {
+        const options = {
+            filter: {
+              id: bondId
+            },
+            fromBlock: 'latest'
+        }
+        console.log("Listening for ResolutionCreated event for id=" + bondId);
+        this.state.contract.ResolutionCreated(options, (err, res) => {
+            console.log("Bond Registered:" + JSON.stringify(res));
+            if (err) {
+                reject(err)
+            } else if (res) {
+                resolve(res)
+                console.log("ResolutionCreated gas:" + this.state.web3.eth.getTransactionReceipt(res.transactionHash).nrgUsed)
+            }
+        });
+    });
+}
 
   //Start of the flow
   accountChanged = (newAddress) => {
 
-
+    console.log(BOND_ABI)
+    console.log(CONTRACT_ADDRESS)
     const contract = window.aionweb3.eth.contract(BOND_ABI).at(CONTRACT_ADDRESS)
-    console.log("contract:" + contract)
+    console.log(contract)
+    const resCount = contract.resolutionCount().toNumber()
+    console.log(resCount)
     this.setState({
       web3: window.aionweb3,
       contract: contract
     }) //address can be accessed from web3 object
     //todo load my bonds
-    const testMyBonds = [];
-    for (var i = 0; i < 10; i++) {
-      testMyBonds.push({
-        id: i,
-        message: "Run the Toronto marathon in May, in under 4hrs!",
-        stake: 3 * Math.pow(10, 18),
-        endTime: (new Date()).getTime() + 1000 * 60 * 60 * 24,
-        friendsList: ["0xa0b4349d567732c1287abb20880deedd84adb0f3163c9bd57a5948a1234a14b5",
-          "0xa0cfbefa57d686eeb52480734f28755be073cb8c71b757a7401b1dd46b5b45de",
-          "0xa06d969971c704fca794718754cafb4486b637621dc76c10a1fd6e6b82a15b1a",
-          "0xa04eeb41d3b82447b85163119845767e019153b5a8f220896bdc08460d1696bc",
-          "0xa058b4acf2e61ecff2f00c0cf47ae4107c6f8c259aa662f2e159053c8d25ef22"],
-        creator: i < 5
-      })
-    }
-    this.setState({ bonds: testMyBonds })
+    // const testMyBonds = [];
+    // for (var i = 0; i < 10; i++) {
+    //   testMyBonds.push({
+    //     id: i,
+    //     message: "Run the Toronto marathon in May, in under 4hrs!",
+    //     stake: 3 * Math.pow(10, 18),
+    //     endTime: (new Date()).getTime() + 1000 * 60 * 60 * 24,
+    //     friendsList: ["0xa09866ac4d3a95614d5a36ecd59977d052684451839a6216f40023aeceae8dbc",
+    //       "0xa069e108b787ecd14c59b0f445e82b30c229e30cb654754d205ae0370c607fc4",
+    //       "0xa0f09de1e3ef119226dbc339dc55e8c5c360bda2cca906a5602f765ef13487ca",
+    //       "0xa0fda14b5d9419de84ba9b72d2cc3df29c54b7dcc5905a130de8c034d79e3187",
+    //       "0xa0f80633c1b64574751f0caea24809cf495faaea0443ad23325eb6fa7e0e8e06"],
+    //     creator: i < 5
+    //   })
+    // }
+    // this.setState({ bonds: testMyBonds })
     //todo load friends bonds
+
+    const participatingBonds = contract.getParticipatingResolutions(window.aionweb3.eth.accounts[0])
+    console.log(participatingBonds)
+    const cleanBonds = participatingBonds[0].map((item, index)=>{return {id:item.toNumber(), creator:participatingBonds[1][index]}} )
+    console.log(cleanBonds)
+    const fullBonds= cleanBonds.map((cleanItem)=>{
+      const fullBond =contract.getResolution(cleanItem.id);
+      return {
+            id: fullBond[0].toNumber(),
+            message: fullBond[1],
+            stake: (fullBond[2].toNumber() / Math.pow(10,18)).toFixed(2),
+            endTime: fullBond[3].toNumber()*1000,
+            friendsList: fullBond[4],
+            creator: cleanItem.creator
+          }
+    })
+    console.log(fullBonds)
+    this.setState({ bonds: fullBonds })
   }
   handleSnackClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -120,7 +162,7 @@ class App extends Component {
     const { createBondOpened, contract, web3, bonds, commitState } = this.state;
     let list = [];
     if (bonds === null || bonds.length === 0) {
-      list.push(<EmptyListPlaceholder style={{ height: '100%' }} />)
+      list.push(<EmptyListPlaceholder style={{ height: '100%', zIndex:2 }} />)
     } else {
       let myBondCount = 0;
       let myBonds = [];
@@ -128,9 +170,9 @@ class App extends Component {
       let friendsBonds = [];
       bonds.forEach((bond) => {
         if (bond.creator) {
-          myBonds.push(<BondListItem id={myBondCount++} bond={bond} />)
+          myBonds.push(<BondListItem id={myBondCount++} bond={bond} contract={contract} web3={web3}/>)
         } else {
-          friendsBonds.push(<FriendBondListItem id={friendsBondsCount++} bond={bond} />)
+          friendsBonds.push(<FriendBondListItem id={friendsBondsCount++} bond={bond} contract={contract} web3={web3}/>)
         }
       })
       if (myBonds.length > 0) {

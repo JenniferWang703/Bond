@@ -1,73 +1,256 @@
 
-const CONTRACT_ADDRESS = "0xa0865422e964feb6bf885ac8bf3420a70ef8b61c9e56b4e18ccdd666a25e62ff";
+const CONTRACT_ADDRESS = "0xa0d8c51502d15fcd6c34ccc927fa0c21ff5fb6fe0526c1f814142bb5f8e63485";
 const apiKey = '8baef3850b99477bb204280ff5a3c7b0';
 const NODE_URL = `https://api.nodesmith.io/v1/aion/testnet/jsonrpc?apiKey=${apiKey}`;
 
-const BOND_ABI = [ { outputs: [ [Object] ],
-  constant: false,
-  payable: false,
-  inputs: [ [Object], [Object] ],
-  name: 'isFriend',
-  type: 'function' },
-{ outputs: [ [Object], [Object], [Object], [Object], [Object] ],
-  constant: false,
-  payable: false,
-  inputs: [ [Object] ],
-  name: 'getResolution',
-  type: 'function' },
-{ outputs: [ [Object] ],
-  constant: true,
-  payable: false,
-  inputs: [],
-  name: 'resolutionCount',
-  type: 'function' },
-{ outputs: [ [Object] ],
-  constant: false,
-  payable: false,
-  inputs: [ [Object] ],
-  name: 'finalResult',
-  type: 'function' },
-{ outputs: [ [Object], [Object], [Object] ],
-  constant: false,
-  payable: false,
-  inputs: [ [Object], [Object] ],
-  name: 'getFriend',
-  type: 'function' },
-{ outputs: [],
-  constant: false,
-  payable: true,
-  inputs:
-   [ [Object],
-     [Object],
-     [Object],
-     [Object],
-     [Object],
-     [Object],
-     [Object],
-     [Object] ],
-  name: 'newResolution',
-  type: 'function' },
-{ outputs: [],
-  constant: false,
-  payable: false,
-  inputs: [ [Object], [Object] ],
-  name: 'makeVote',
-  type: 'function' },
-{ outputs: [],
-  inputs: [ [Object] ],
-  name: 'ResolutionCreated',
-  anonymous: false,
-  type: 'event' },
-{ outputs: [],
-  inputs: [ [Object], [Object] ],
-  name: 'VoteCreated',
-  anonymous: false,
-  type: 'event' },
-{ outputs: [],
-  inputs: [ [Object] ],
-  name: 'ResolutionCompleted',
-  anonymous: false,
-  type: 'event' } ];
+const BOND_ABI = [
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "resolutionId",
+				"type": "uint128"
+			},
+			{
+				"name": "friendAddr",
+				"type": "address"
+			}
+		],
+		"name": "isFriend",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"type": "function",
+		"stateMutability": "nonpayable"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "resolutionId",
+				"type": "uint128"
+			}
+		],
+		"name": "getResolution",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint128"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "uint128"
+			},
+			{
+				"name": "",
+				"type": "uint128"
+			},
+			{
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"payable": false,
+		"type": "function",
+		"stateMutability": "view"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "resolutionCount",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint128"
+			}
+		],
+		"payable": false,
+		"type": "function",
+		"stateMutability": "view"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "addr",
+				"type": "address"
+			}
+		],
+		"name": "getParticipatingResolutions",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint128[]"
+			},
+			{
+				"name": "",
+				"type": "bool[]"
+			}
+		],
+		"payable": false,
+		"type": "function",
+		"stateMutability": "view"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "resolutionId",
+				"type": "uint128"
+			}
+		],
+		"name": "finalResult",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"type": "function",
+		"stateMutability": "nonpayable"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "resolutionId",
+				"type": "uint128"
+			},
+			{
+				"name": "friendAddr",
+				"type": "address"
+			}
+		],
+		"name": "getFriend",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"type": "function",
+		"stateMutability": "nonpayable"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_message",
+				"type": "string"
+			},
+			{
+				"name": "_stake",
+				"type": "uint128"
+			},
+			{
+				"name": "_endTime",
+				"type": "uint128"
+			},
+			{
+				"name": "friend1",
+				"type": "address"
+			},
+			{
+				"name": "friend2",
+				"type": "address"
+			},
+			{
+				"name": "friend3",
+				"type": "address"
+			},
+			{
+				"name": "friend4",
+				"type": "address"
+			},
+			{
+				"name": "friend5",
+				"type": "address"
+			}
+		],
+		"name": "newResolution",
+		"outputs": [],
+		"payable": true,
+		"type": "function",
+		"stateMutability": "payable"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "resolutionId",
+				"type": "uint128"
+			},
+			{
+				"name": "_voteCompleted",
+				"type": "bool"
+			}
+		],
+		"name": "makeVote",
+		"outputs": [],
+		"payable": false,
+		"type": "function",
+		"stateMutability": "nonpayable"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "id",
+				"type": "uint128"
+			}
+		],
+		"name": "ResolutionCreated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "resId",
+				"type": "uint128"
+			},
+			{
+				"indexed": false,
+				"name": "vote",
+				"type": "bool"
+			}
+		],
+		"name": "VoteCreated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "id",
+				"type": "uint128"
+			}
+		],
+		"name": "ResolutionCompleted",
+		"type": "event"
+	}
+];
 
 module.exports = {
   CONTRACT_ADDRESS,

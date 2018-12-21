@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 const styles = theme => ({
   card: {
     ...theme.mixins.gutters(),
-    maxWidth: 350,
+    maxWidth: 390,
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
     background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
@@ -34,8 +34,8 @@ class EmptyListPlaceholder extends Component {
     const { classes } = this.props;
     const randomImage = `/assets/animals/Group_${this.state.imageId}.svg`
     return (
-      <div>
-        <Paper className={classes.card} elevation={1}>
+      <div style={{zIndex:2 }}>
+        <Paper className={classes.card} elevation={2}>
           <div>
 
             <img className={classes.image} src={randomImage} style={{ float: 'left', marginRight:'20px' }} />
