@@ -6,13 +6,14 @@ import EmptyListPlaceholder from './ui/EmptyListPlaceholder'
 import CreateBondModal from './ui/CreateBondModal'
 import BondListItem from './ui/BondListItem'
 import FriendBondListItem from './ui/FriendBondListItem'
+import InfoModal from './ui/InfoModal'
 import { Web3Provider } from 'react-aionweb3'
-import Web3 from 'aion-web3';
 import './App.css';
 import green from '@material-ui/core/colors/green';
 import amber from '@material-ui/core/colors/amber';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import InfoIcon from '@material-ui/icons/InfoOutlined';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
@@ -30,6 +31,13 @@ const styles = theme => ({
     bottom: theme.spacing.unit * 2,
     zIndex: 1,
     right: "20%",
+    margin: '0 auto',
+  },
+  fabLeft: {
+    position: 'fixed',
+    bottom: theme.spacing.unit * 2,
+    zIndex: 1,
+    left: "20%",
     margin: '0 auto',
   },
   sectionHeader: {
@@ -51,6 +59,7 @@ class App extends Component {
       web3: null,
       contract: null,
       createBondOpened: false,
+      infoOpened:false,
       bonds: null,
       commitState: 0,//possible values 0,1,2
     };
@@ -64,8 +73,11 @@ class App extends Component {
 
   handleOpenCreateBond = () => {
     this.setState({ createBondOpened: true });
-    console.log("handleOpen:")
   };
+
+  handleOpenInfo = () => {
+    this.setState({ infoOpened: true });
+  }
 
   onBondCreationFinished = (bondId, txR) => {
     console.log("onBondCreationFinished:" + bondId+", "+txR)
@@ -156,7 +168,7 @@ class App extends Component {
 
   render() {
     const { classes } = this.props;
-    const { createBondOpened, contract, web3, bonds, commitState } = this.state;
+    const { createBondOpened, infoOpened, contract, web3, bonds, commitState } = this.state;
     let list = [];
     if (bonds === null || bonds.length === 0) {
       list.push(<EmptyListPlaceholder style={{ height: '100%', zIndex:2 }} />)
@@ -209,6 +221,9 @@ class App extends Component {
           <Fab color="primary" aria-label="Add" className={classes.fab} onClick={this.handleOpenCreateBond}>
             <AddIcon />
           </Fab>
+          <Fab color="secondary" aria-label="Info" className={classes.fabLeft} onClick={this.handleOpenInfo}>
+            <InfoIcon color="primary" />
+          </Fab>
           <Snackbar
             ContentProps={{
               classes: {
@@ -244,6 +259,9 @@ class App extends Component {
             contract={contract}
             open={createBondOpened}
             onClose={this.onBondCreationFinished} />
+            <InfoModal
+              open={infoOpened}
+              onClose={()=>{this.setState({ infoOpened: false })}} />
 
         </Web3Provider>
 

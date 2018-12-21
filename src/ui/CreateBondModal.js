@@ -12,8 +12,7 @@ import ErrorIcon from '@material-ui/icons/Error'
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
-import { DatePicker } from 'material-ui-pickers';
-import { formatEndDate } from '../utils/utils'
+import { DateTimePicker } from 'material-ui-pickers';
 const styles = theme => ({
     root: {
         width: '100%',
@@ -58,6 +57,9 @@ const styles = theme => ({
         top: 0,
         right: 0
     },
+    formItem:{
+        minWidth:"240px"
+    }
 });
 class CreateBondModal extends Component {
     constructor(props) {
@@ -184,6 +186,7 @@ class CreateBondModal extends Component {
                                     <TextField
                                         id="standard-name"
                                         label="Your Stake"
+                                        className={classes.formItem}
                                         onChange={(event) => this.handleBondStake(event.target.value)}
                                         value={stakeAmount}
                                         margin="normal"
@@ -197,7 +200,8 @@ class CreateBondModal extends Component {
                                             )
                                         }} />
                                     {'\u00A0'}
-                                    <DatePicker
+                                    <DateTimePicker
+                                        className={classes.formItem}
                                         margin="normal"
                                         label="Your Deadline"
                                         value={deadline}
@@ -213,22 +217,24 @@ class CreateBondModal extends Component {
                                         <Grid>
 
                                             <TextField
+                                                className={classes.formItem}
                                                 id="standard-name"
                                                 label="Friend 1"
                                                 onChange={(event) => { friends[0] = event.target.value }}
                                                 value={friends[0]}
                                                 margin="normal"
                                                 variant="outlined"
-                                                className={this.props.classes.input}
+                                                className={this.props.classes.input+" "+classes.formItem}
                                             />{'\u00A0'}
                                             <TextField
+                                                className={classes.formItem}
                                                 id="standard-name"
                                                 label="Friend 2"
                                                 onChange={(event) => { friends[1] = event.target.value }}
                                                 value={friends[1]}
                                                 margin="normal"
                                                 variant="outlined"
-                                                className={this.props.classes.input}
+                                                className={this.props.classes.input+" "+classes.formItem}
                                             />
                                             <TextField
                                                 id="standard-name"
@@ -237,7 +243,7 @@ class CreateBondModal extends Component {
                                                 value={friends[2]}
                                                 margin="normal"
                                                 variant="outlined"
-                                                className={this.props.classes.input}
+                                                className={this.props.classes.input+" "+classes.formItem}
                                             />{'\u00A0'}
                                             <TextField
                                                 id="standard-name"
@@ -246,16 +252,17 @@ class CreateBondModal extends Component {
                                                 value={friends[3]}
                                                 margin="normal"
                                                 variant="outlined"
-                                                className={this.props.classes.input}
+                                                className={this.props.classes.input+" "+classes.formItem}
                                             />
                                             <TextField
+                                                className={classes.formItem}
                                                 id="standard-name"
                                                 label="Friend 5"
                                                 onChange={(event) => { friends[4] = event.target.value }}
                                                 value={friends[4]}
                                                 margin="normal"
                                                 variant="outlined"
-                                                className={this.props.classes.input}
+                                                className={this.props.classes.input+" "+classes.formItem}
                                             />
 
                                             <div>

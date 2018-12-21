@@ -8,7 +8,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import {formatEndDatePretty} from '../utils/utils'
+import {formatEndDatePrettyLong} from '../utils/utils'
 
 const styles = theme => ({
   headingGrid: {
@@ -54,7 +54,7 @@ function BondListItem(props) {
             justify="space-between"
             alignItems="center">
             <Typography gutterBottom variant="h5" component="h2">
-              {formatEndDatePretty(bond.endTime)}
+              {formatEndDatePrettyLong(bond.endTime)}
           </Typography>
             <Typography className={classes.price} gutterBottom variant="h5" component="h2">
             {'\u00A0'}<img alt="Aion Logo" src="/assets/images/red_aion_logo.png" width="18px" height="18px" />
