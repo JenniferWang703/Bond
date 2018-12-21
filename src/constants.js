@@ -1,7 +1,7 @@
 
-const CONTRACT_ADDRESS = "0xa064dAe48Cd78C42bb43Fd913b9A3661eD20a106f22eFB3d4C333E510b68eb1e";
-
-const NODE_URL = `http://178.128.227.209:8545`;
+const CONTRACT_ADDRESS = "0xa0865422e964feb6bf885ac8bf3420a70ef8b61c9e56b4e18ccdd666a25e62ff";
+const apiKey = '8baef3850b99477bb204280ff5a3c7b0';
+const NODE_URL = `https://api.nodesmith.io/v1/aion/testnet/jsonrpc?apiKey=${apiKey}`;
 
 const BOND_ABI = [ { outputs: [ [Object] ],
   constant: false,
@@ -14,6 +14,12 @@ const BOND_ABI = [ { outputs: [ [Object] ],
   payable: false,
   inputs: [ [Object] ],
   name: 'getResolution',
+  type: 'function' },
+{ outputs: [ [Object] ],
+  constant: true,
+  payable: false,
+  inputs: [],
+  name: 'resolutionCount',
   type: 'function' },
 { outputs: [ [Object] ],
   constant: false,

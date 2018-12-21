@@ -41,7 +41,7 @@ contract Bond  is Timed, Staked {
     }
     
     mapping (uint128  => Resolution) resolutions;
-    uint128 resolutionCount;
+    uint128 public resolutionCount;
     
     //Events
     event ResolutionCreated(uint128 id);
@@ -149,6 +149,22 @@ contract Bond  is Timed, Staked {
     function getResolution(uint128 resolutionId) public returns(uint128, string, uint128, uint128, address[]){
         Resolution storage resolution = resolutions[resolutionId];
         return(resolutionId, resolution.message, resolution.stake, resolution.endTime, resolution.friendsList);
+    }
+    function getParticipatingResolutions() public returns (uint128[], bool[]){
+        uint128 participationCount = 0;
+        for(uint128 i=0; i<resolutionCount; i++){
+            Resolution storage resolution = resolutions[i];
+            if(resolution.bonderAddress == msg.sender || resolution.friendAddressMap[msg.sender].friendAddr!=0){
+                ++participationCount;
+            }
+        }
+        uint128[] memory resolutionIds = new uint128[](participationCount);
+        bool[] memory creatorFlag = new bool[](participationCount);
+        for(uint128 j=0; j<resolutionCount; j++){
+            resolutionIds[j] = j;
+            creatorFlag[j] = resolutions[j].bonderAddress == msg.sender;
+        }
+        return (resolutionIds, creatorFlag);
     }
 }
 

@@ -5,7 +5,7 @@
  * View the README for instructions on how to compile and deploy the contract.
  */
 // const CONTRACT_ADDRESS = process.env.FTR_CONTRACT_ADDRESS || 'FTR_CONTRACT_ADDRESS';
-const CONTRACT_ADDRESS = "0xa064dAe48Cd78C42bb43Fd913b9A3661eD20a106f22eFB3d4C333E510b68eb1e";
+const CONTRACT_ADDRESS = "0xa0865422e964feb6bf885ac8bf3420a70ef8b61c9e56b4e18ccdd666a25e62ff";
 
 /**
  * This is the private key of the account that will be submitting transactions to the network (and thus
@@ -14,7 +14,7 @@ const CONTRACT_ADDRESS = "0xa064dAe48Cd78C42bb43Fd913b9A3661eD20a106f22eFB3d4C33
  * For a production App, this should be stored as an environment variable.
  */
 // const PRIVATE_KEY = process.env.FTR_PRIVATE_KEY || 'FTR_PRIVATE_KEY';
-const PRIVATE_KEY = '094577139ac3c71c6b1a18e9929342d53451b55b0655ffcAAAAAAAAAAAAAAAAAAAAA0b9f479951165522b7349e4e317b7a17ca2bbb670af320bf9619fb54';
+const PRIVATE_KEY = '094577139ac3c71c6b1a18e9929342d53451b55b0655ffc9111c658c377ee78fe0c08f8d0b9f479951165522b7349e4e317b7a17ca2bbb670af320bf9619fb54';
 
 
 /**
@@ -27,7 +27,7 @@ const apiKey = '8baef3850b99477bb204280ff5a3c7b0';
 
 
 
-const NODE_URL = `http://178.128.227.209:8545`;
+const NODE_URL = `https://api.nodesmith.io/v1/aion/testnet/jsonrpc?apiKey=${apiKey}`;
 
 const BOND_ABI = [ { outputs: [ [Object] ],
   constant: false,
@@ -40,6 +40,12 @@ const BOND_ABI = [ { outputs: [ [Object] ],
   payable: false,
   inputs: [ [Object] ],
   name: 'getResolution',
+  type: 'function' },
+{ outputs: [ [Object] ],
+  constant: true,
+  payable: false,
+  inputs: [],
+  name: 'resolutionCount',
   type: 'function' },
 { outputs: [ [Object] ],
   constant: false,

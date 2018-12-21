@@ -5,44 +5,58 @@ import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
+import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import zIndex from '@material-ui/core/styles/zIndex';
+import {formatEndDatePretty} from '../utils/utils'
 
-const styles = {
-  card: {
-    marginTop:24,
-    maxWidth: 345,
-    background: 'linear-gradient(45deg, #D4005E 30%, #FCF653 90%)',
-    zIndex:1
+const styles = theme => ({
+  headingGrid: {
+    flexGrow: 1,
   },
-  actionsGroup:{
-      background:'#ffffff'
+  card: {
+    marginTop: 24,
+    maxWidth: 500,
+    background: 'linear-gradient(45deg, #D4005E 30%, #FCF653 90%)',
+    zIndex: 1
+  },
+  cardContent: {
+    margin: theme.spacing.unit * 4
+  },
+  actionsGroup: {
+    background: '#ffffff'
+  },
+  price: {
+    color: "#D4005E"
   }
-};
+});
 
 function BondListItem(props) {
-  const { classes } = props;
+  const { classes, bond } = props;
   return (
     <Card className={classes.card}>
       <CardActionArea>
         <CardContent>
-          <Typography gutterBottom variant="h5" component="h2">
-            2019-04-05
+          <Grid container
+            direction="row"
+            justify="space-between"
+            alignItems="center">
+            <Typography gutterBottom variant="h5" component="h2">
+              {formatEndDatePretty(bond.endTime)}
           </Typography>
-          <Typography component="p">
-            Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-            across all continents except Antarctica
+            <Typography className={classes.price} gutterBottom variant="h5" component="h2">
+              <img alt="Aion Logo" src="/assets/images/red_aion_logo.png" width="18px" height="18px" />
+              {'\u00A0'}{(bond.stake/Math.pow(10,18)).toFixed(2)}
+          </Typography>
+          </Grid>
+          <Typography className={classes.cardContent} component="p">
+            {bond.message}
           </Typography>
         </CardContent>
       </CardActionArea>
       <CardActions className={classes.actionsGroup}>
         <Button size="small" color="primary">
-          Share
-        </Button>
-        <Button size="small" color="primary">
-          Learn More
+          Complete
         </Button>
       </CardActions>
     </Card>
