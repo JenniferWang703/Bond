@@ -1,5 +1,6 @@
-
-const CONTRACT_ADDRESS = "0xa05a21dd82bdf6e6c5a8adb2cf1d489d4a892a008deeb5e3fc1be50e628e16ba";//mastery "0xa080849a2c0a1c01f2c01e79f3ce4d9f023ddc6c6bcb745cadc3fcd722603598"
+//mainnet "0xa05a21dd82bdf6e6c5a8adb2cf1d489d4a892a008deeb5e3fc1be50e628e16ba"
+//mastery "0xa080849a2c0a1c01f2c01e79f3ce4d9f023ddc6c6bcb745cadc3fcd722603598"
+const CONTRACT_ADDRESS = "0xa080849a2c0a1c01f2c01e79f3ce4d9f023ddc6c6bcb745cadc3fcd722603598";
 const apiKey = '8baef3850b99477bb204280ff5a3c7b0';
 const NODE_URL = `https://api.nodesmith.io/v1/aion/testnet/jsonrpc?apiKey=${apiKey}`;
 
