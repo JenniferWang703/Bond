@@ -100,7 +100,7 @@ class App extends Component {
         //   this.accountChanged(window.aionweb3.eth.accounts[0]) // can be optimized
         //   clearInterval(interval);
         // })
-      }, 20*1000);
+      }, 30*1000);
       
     }
   }

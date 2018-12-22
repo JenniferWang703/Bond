@@ -35,7 +35,8 @@ const styles = theme => ({
 function payout(web3, contract, bondId){
   console.log(web3!==null&&contract!==null)
   contract.finalResult(
-    bondId
+    bondId,
+    {gas:2000000}
   ).then((res)=>{
     console.log(res)
   }).catch((err)=>{

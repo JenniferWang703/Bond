@@ -1,5 +1,5 @@
 
-const CONTRACT_ADDRESS = "0xa0778d1dacd5bd6df198e7b142c23498d0392fce9ed34f5daacc2e4dba9a6a49";
+const CONTRACT_ADDRESS = "0xa080849a2c0a1c01f2c01e79f3ce4d9f023ddc6c6bcb745cadc3fcd722603598";
 const apiKey = '8baef3850b99477bb204280ff5a3c7b0';
 const NODE_URL = `https://api.nodesmith.io/v1/aion/testnet/jsonrpc?apiKey=${apiKey}`;
 
@@ -60,6 +60,18 @@ const BOND_ABI = [
 			{
 				"name": "",
 				"type": "address[]"
+			},
+			{
+				"name": "",
+				"type": "uint128"
+			},
+			{
+				"name": "",
+				"type": "uint128"
+			},
+			{
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"payable": false,
@@ -249,6 +261,11 @@ const BOND_ABI = [
 				"indexed": false,
 				"name": "id",
 				"type": "uint128"
+			},
+			{
+				"indexed": false,
+				"name": "won",
+				"type": "bool"
 			}
 		],
 		"name": "ResolutionCompleted",

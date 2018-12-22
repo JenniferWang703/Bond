@@ -46,7 +46,7 @@ contract Bond  is Timed, Staked {
     //Events
     event ResolutionCreated(uint128 id);
     event VoteCreated(uint128 resId, bool vote);
-    event ResolutionCompleted(uint128 id);
+    event ResolutionCompleted(uint128 id, bool won);
     
     //test addresses
     //"0x53d284357ec70ce289d6d64134dfac8e511c8a3d","0xbe0eb53f46cd790cd13851d5eff43d12404d33e8","0x3bf86ed8a3153ec933786a02ac090301855e576b","0x74660414dfae86b196452497a4332bd0e6611e82","0x847ed5f2e5dde85ea2b685edab5f1f348fb140ed"
@@ -120,16 +120,15 @@ contract Bond  is Timed, Staked {
     
     //based on he gets a refund or not
     function isGettingStakeBack(uint128 resolutionId) private returns (bool) {
-        return resolutions[resolutionId].validationCount > resolutions[resolutionId].friendsList.length/2+1;
+        return resolutions[resolutionId].validationTrueCount >= 3;
     } 
     
     //result abd pay    
     function finalResult(uint128 resolutionId) public returns (bool) {
         require(false == resolutions[resolutionId].completed);
         require(msg.sender == resolutions[resolutionId].bonderAddress);
-        require(resolutions[resolutionId].validationCount>=resolutions[resolutionId].friendsList.length/2+1);
-        bool result;
-        result = isGettingStakeBack(resolutionId);
+        require(resolutions[resolutionId].validationTrueCount>=3 || resolutions[resolutionId].validationCount-resolutions[resolutionId].validationTrueCount>=3);
+        bool result = isGettingStakeBack(resolutionId);
         //if bonder completed the resolutions
         if(result) {
             //send transaction back to resolutions[resolutionId].bonderAddress
@@ -139,16 +138,16 @@ contract Bond  is Timed, Staked {
             for(uint128 i = 0; i < resolutions[resolutionId].friendsList.length; i++) {
                 //pay resolution[resolutionId].friendVotedFalse[i] shareToPay Aion
                 resolutions[resolutionId].friendsList[i].transfer(shareToPay);
-             }
+            }
         }
         resolutions[resolutionId].completed = true;
-        ResolutionCompleted(resolutionId);
+        ResolutionCompleted(resolutionId, result);
     }
     
     //Getters
-    function getResolution(uint128 resolutionId) public constant returns(uint128,address, string, uint128, uint128, address[]){
+    function getResolution(uint128 resolutionId) public constant returns(uint128,address, string, uint128, uint128, address[], uint128, uint128, bool){
         Resolution storage resolution = resolutions[resolutionId];
-        return(resolutionId,resolution.bonderAddress, resolution.message, resolution.stake, resolution.endTime, resolution.friendsList);
+        return(resolutionId,resolution.bonderAddress, resolution.message, resolution.stake, resolution.endTime, resolution.friendsList, resolution.validationCount, resolution.validationTrueCount, resolution.completed);
     }
     
     function getParticipatingResolutions(address addr) public constant returns (uint128[], bool[]){
@@ -156,18 +155,17 @@ contract Bond  is Timed, Staked {
         for(uint128 i=0; i<resolutionCount; i++){
             Resolution storage resolution = resolutions[i];
             if(resolution.bonderAddress == addr || resolution.friendAddressMap[addr].friendAddr!=0){
-                ++participationCount;
+                participationCount+=1;
             }
         }
         uint128[] memory resolutionIds = new uint128[](participationCount);
         bool[] memory creatorFlag = new bool[](participationCount);
-        uint128 counter = 0;
         for(uint128 j=0; j<resolutionCount; j++){
             Resolution storage resolution2 = resolutions[j];
             if(resolution2.bonderAddress == addr || resolution2.friendAddressMap[addr].friendAddr!=0){
-                resolutionIds[counter] = j;
-                creatorFlag[counter] = resolution2.bonderAddress == addr;
-                ++counter;
+                resolutionIds[participationCount-1] = j;
+                creatorFlag[participationCount-1] = resolution2.bonderAddress == addr;
+                participationCount-=1;
             }
         }
         return (resolutionIds, creatorFlag);
