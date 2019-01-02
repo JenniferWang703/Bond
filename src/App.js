@@ -90,21 +90,26 @@ class App extends Component {
       web3: window.aionweb3,
       contract: contract
     })
-    const participatingBonds = contract.getParticipatingResolutions(window.aionweb3.eth.accounts[0])
-    console.log("Bonds this account is participating in:" + participatingBonds)
-    const cleanBonds = participatingBonds[0].map((item, index) => { return { id: item.toNumber(), creator: participatingBonds[1][index] } })
-    const fullBonds = cleanBonds.map((cleanItem) => {
-      const fullBond = contract.getResolution(cleanItem.id);
-      console.log("Bond data model:" + JSON.stringify(fullBond))
-      return {
+    const fullBonds = [];
+    for(var i=0; i<resCount; i++){
+      const fullBond = contract.getResolution(i);
+      const bond = {
         id: fullBond[0].toNumber(),
+        address: fullBond[1],
         message: fullBond[2],
         stake: (fullBond[3].toNumber() / Math.pow(10, 18)).toFixed(2),
         endTime: fullBond[4].toNumber() * 1000,
         friendsList: fullBond[5],
-        creator: cleanItem.creator
+        creator: null
       }
-    })
+      if(bond.address===window.aionweb3.eth.accounts[0]){
+        bond.creator = true;
+        fullBonds.push(bond);
+      }else if(bond.friendsList.includes(window.aionweb3.eth.accounts[0])){
+        bond.creator = false;
+        fullBonds.push(bond);
+      }
+    }
     this.setState({ bonds: fullBonds })
   }
 
